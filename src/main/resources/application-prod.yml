@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/mission_tracking}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+server:
+  port: ${SERVER_PORT:8080}
+
+# WebSocket 설정
+websocket:
+  url: ${WEBSOCKET_URL:ws://localhost:8080/ws}
+
+# Mission 설정
+mission:
+  expires-in: ${MISSION_EXPIRES_IN:3600000}
+
+# CORS 설정
+cors:
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000}
+
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    org.springframework: WARN
+    org.hibernate.SQL: WARN
+    org.example.greduatebe: ${LOGGING_LEVEL_APP:INFO}
