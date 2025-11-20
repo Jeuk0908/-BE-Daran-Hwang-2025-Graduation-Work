@@ -22,14 +22,12 @@ public class WebSocketMessage {
     @NotBlank(message = "eventType은 필수입니다")
     private String eventType;
 
-    @NotNull(message = "timestamp는 필수입니다")
-    private LocalDateTime timestamp;
+    private LocalDateTime timestamp;  // Optional - 없으면 서버에서 현재 시간 사용
 
     @NotBlank(message = "sessionId는 필수입니다")
     private String sessionId;
 
     private String attemptId;
 
-    @NotNull(message = "data는 필수입니다")
-    private Map<String, Object> data;
+    private Map<String, Object> data;  // Optional - 없으면 빈 Map 사용
 }

@@ -534,7 +534,7 @@ public class MissionAnalysisService {
                     .attemptId(rs.getString("attempt_id"))
                     .missionType(MissionType.valueOf(rs.getString("mission_type")))
                     .missionName(rs.getString("mission_name"))
-                    .rating(rs.getInt("rating"))
+                    .rating(rs.getObject("rating") != null ? rs.getInt("rating") : null)  // null 처리
                     .ratingText(rs.getString("rating_text"))
                     .feedback(rs.getString("feedback"))
                     .hasFeedback(rs.getBoolean("has_feedback"))
@@ -605,7 +605,7 @@ public class MissionAnalysisService {
                     .attemptId(rs.getString("attempt_id"))
                     .missionType(MissionType.valueOf(rs.getString("mission_type")))
                     .missionName(rs.getString("mission_name"))
-                    .rating(rs.getInt("rating"))
+                    .rating(rs.getObject("rating") != null ? rs.getInt("rating") : null)  // null 처리
                     .ratingText(rs.getString("rating_text"))
                     .feedback(rs.getString("feedback"))
                     .hasFeedback(rs.getBoolean("has_feedback"))

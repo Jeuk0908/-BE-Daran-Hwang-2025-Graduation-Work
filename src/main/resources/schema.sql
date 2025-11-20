@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS reviews (
     id BIGSERIAL PRIMARY KEY,
     review_id VARCHAR(50) UNIQUE NOT NULL,
     attempt_id VARCHAR(50) NOT NULL,
-    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    rating INTEGER CHECK (rating IS NULL OR (rating >= 1 AND rating <= 5)),
     rating_text VARCHAR(20) NOT NULL,
     feedback TEXT,
     has_feedback BOOLEAN NOT NULL,

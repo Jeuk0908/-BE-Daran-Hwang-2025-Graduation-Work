@@ -53,6 +53,14 @@ public class EventService {
         // MissionAttempt 존재 여부 확인
         MissionAttempt missionAttempt = missionService.getMissionAttempt(message.getAttemptId());
 
+        // timestamp가 없으면 현재 시간 사용
+        LocalDateTime timestamp = message.getTimestamp() != null ?
+                message.getTimestamp() : LocalDateTime.now();
+
+        // data가 없으면 빈 Map 사용
+        Map<String, Object> data = message.getData() != null ?
+                message.getData() : new java.util.HashMap<>();
+
         // eventId 생성
         String eventId = generateEventId();
 
@@ -62,8 +70,8 @@ public class EventService {
                 .attemptId(message.getAttemptId())
                 .sessionId(message.getSessionId())
                 .eventType(message.getEventType())
-                .timestamp(message.getTimestamp())
-                .data(message.getData())
+                .timestamp(timestamp)
+                .data(data)
                 .processingTime(System.currentTimeMillis() - startTime)
                 .build();
 
@@ -71,12 +79,17 @@ public class EventService {
 
         // 미션 종료 이벤트 처리
         if (isMissionEndEvent(message.getEventType())) {
-            handleMissionEnd(message.getAttemptId(), message.getEventType(), message.getTimestamp());
+            handleMissionEnd(message.getAttemptId(), message.getEventType(), timestamp);
         }
 
         // 미션 평가 이벤트 처리 (리뷰 저장)
         if ("mission_rating_submitted".equals(message.getEventType())) {
-            handleMissionRating(message.getAttemptId(), message.getData());
+            handleMissionRating(message.getAttemptId(), data);
+        }
+
+        // 미션 포기 이벤트 처리 (포기 사유 저장)
+        if ("mission_quitted".equals(message.getEventType())) {
+            handleMissionQuit(message.getAttemptId(), data);
         }
 
         log.info("Event processed successfully - eventId: {}, processingTime: {}ms",
@@ -216,6 +229,56 @@ public class EventService {
         } catch (Exception e) {
             log.error("❌ [Review] Error handling mission rating - attemptId: {}", attemptId, e);
             // 리뷰 저장 실패해도 이벤트 처리는 계속 진행
+        }
+    }
+
+    /**
+     * 미션 포기 이벤트 처리 (포기 사유 저장)
+     * @param attemptId 미션 시도 ID
+     * @param data 이벤트 데이터
+     */
+    @Transactional
+    public void handleMissionQuit(String attemptId, Map<String, Object> data) {
+        log.info("🚪 [Quit] Handling mission quit - attemptId: {}", attemptId);
+
+        try {
+            // 이미 리뷰가 있는지 확인
+            if (reviewService.hasReview(attemptId)) {
+                log.warn("⚠️ [Quit] Review already exists for attemptId: {}", attemptId);
+                return;
+            }
+
+            // reason 필드 추출
+            String reason = (String) data.get("reason");
+
+            // reason이 없으면 리뷰를 생성하지 않음
+            if (reason == null || reason.trim().isEmpty()) {
+                log.info("ℹ️ [Quit] No quit reason provided for attemptId: {}", attemptId);
+                return;
+            }
+
+            // Review 엔티티 생성 (포기 사유)
+            String reviewId = "review_" + UUID.randomUUID().toString().replace("-", "");
+
+            Review review = Review.builder()
+                    .reviewId(reviewId)
+                    .attemptId(attemptId)
+                    .rating(null)  // 포기한 경우 평점 없음
+                    .ratingText("포기")  // 포기 표시
+                    .feedback(reason)  // 포기 사유를 feedback에 저장
+                    .hasFeedback(true)
+                    .submittedAt(LocalDateTime.now())
+                    .build();
+
+            // 리뷰 저장
+            Review savedReview = reviewService.saveReviewDirectly(review);
+
+            log.info("✅ [Quit] Quit reason saved as review - reviewId: {}, attemptId: {}, reason length: {}",
+                    savedReview.getReviewId(), attemptId, reason.length());
+
+        } catch (Exception e) {
+            log.error("❌ [Quit] Error handling mission quit - attemptId: {}", attemptId, e);
+            // 포기 사유 저장 실패해도 이벤트 처리는 계속 진행
         }
     }
 }

@@ -28,10 +28,10 @@ public class Review {
     @Column(name = "attempt_id", nullable = false, length = 50)
     private String attemptId;
 
-    @Column(name = "rating", nullable = false)
+    @Column(name = "rating")
     private Integer rating;
 
-    @Column(name = "rating_text", nullable = false, length = 20)
+    @Column(name = "rating_text", length = 20)
     private String ratingText;
 
     @Column(name = "feedback", columnDefinition = "TEXT")

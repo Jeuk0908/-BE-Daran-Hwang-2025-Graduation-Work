@@ -161,7 +161,8 @@
 
         <div class="row">
             <div class="col-md-6" th:each="review : ${reviews}">
-                <div class="card review-card">
+                <!-- 완료한 미션 (평점 있음) -->
+                <div class="card review-card" th:if="${review.rating != null}" style="border-left: 4px solid #007bff;">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
@@ -201,6 +202,54 @@
                         <div class="mt-3">
                             <a th:href="@{/admin/dashboard/attempt/{id}(id=${review.attemptId})}"
                                class="btn btn-sm btn-outline-primary w-100">
+                                미션 상세 보기
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 포기한 미션 (포기 사유) -->
+                <div class="card review-card" th:if="${review.rating == null && review.ratingText == '포기'}" style="border-left: 4px solid #dc3545;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span style="font-size: 1.5rem;">😞</span>
+                                <span class="badge bg-danger ms-2">미션 포기</span>
+                            </div>
+                            <span class="badge"
+                                  th:classappend="${review.missionType.name() == 'PORTFOLIO'} ? 'bg-primary' : 'bg-success'"
+                                  th:text="${review.missionType}">
+                                PORTFOLIO
+                            </span>
+                        </div>
+
+                        <h6 class="card-subtitle mb-2 text-muted" th:text="${review.missionName}">포트폴리오 생성 미션</h6>
+
+                        <div th:if="${review.hasFeedback && review.feedback != null && !#strings.isEmpty(review.feedback)}"
+                             class="mt-3 mb-3"
+                             style="background: #fff5f5; padding: 12px; border-radius: 6px; border-left: 3px solid #dc3545;">
+                            <small class="text-muted">🚪 포기 사유:</small><br>
+                            <span th:text="${review.feedback}">너무 어려워서 포기했습니다</span>
+                        </div>
+
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <strong>Attempt ID:</strong> <code th:text="${#strings.substring(review.attemptId, 0, 20)} + '...'">attempt_xxx</code>
+                            </small>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <small class="text-muted">
+                                소요 시간: <strong th:text="${review.missionDurationFormatted}">3분 20초</strong>
+                            </small>
+                            <small class="text-muted" th:text="${#temporals.format(review.submittedAt, 'yyyy-MM-dd HH:mm')}">
+                                2025-01-20 10:30
+                            </small>
+                        </div>
+
+                        <div class="mt-3">
+                            <a th:href="@{/admin/dashboard/attempt/{id}(id=${review.attemptId})}"
+                               class="btn btn-sm btn-outline-danger w-100">
                                 미션 상세 보기
                             </a>
                         </div>

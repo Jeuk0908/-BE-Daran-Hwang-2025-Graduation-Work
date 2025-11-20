@@ -147,18 +147,37 @@
                             <div class="col-md-4" th:each="review : ${recentReviews}" th:if="${reviewStat.index < 6}">
                                 <div class="card review-card mb-3">
                                     <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <span class="star-rating" th:text="${review.starRating}">⭐⭐⭐⭐⭐</span>
-                                            <span class="badge"
-                                                  th:classappend="${review.missionType.name() == 'PORTFOLIO'} ? 'bg-primary' : 'bg-success'"
-                                                  th:text="${review.missionType}">
-                                                PORTFOLIO
-                                            </span>
+                                        <!-- 완료한 미션 (평점 있음) -->
+                                        <div th:if="${review.rating != null}">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <span class="star-rating" th:text="${review.starRating}">⭐⭐⭐⭐⭐</span>
+                                                <span class="badge"
+                                                      th:classappend="${review.missionType.name() == 'PORTFOLIO'} ? 'bg-primary' : 'bg-success'"
+                                                      th:text="${review.missionType}">
+                                                    PORTFOLIO
+                                                </span>
+                                            </div>
+
+                                            <h6 class="card-subtitle mb-2">
+                                                <span class="badge bg-secondary" th:text="${review.ratingText}">매우 쉬움</span>
+                                            </h6>
                                         </div>
 
-                                        <h6 class="card-subtitle mb-2">
-                                            <span class="badge bg-secondary" th:text="${review.ratingText}">매우 쉬움</span>
-                                        </h6>
+                                        <!-- 포기한 미션 (포기 사유) -->
+                                        <div th:if="${review.rating == null && review.ratingText == '포기'}">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <span style="font-size: 1.5rem;">😞</span>
+                                                <span class="badge"
+                                                      th:classappend="${review.missionType.name() == 'PORTFOLIO'} ? 'bg-primary' : 'bg-success'"
+                                                      th:text="${review.missionType}">
+                                                    PORTFOLIO
+                                                </span>
+                                            </div>
+
+                                            <h6 class="card-subtitle mb-2">
+                                                <span class="badge bg-danger">미션 포기</span>
+                                            </h6>
+                                        </div>
 
                                         <div th:if="${review.hasFeedback && review.feedback != null && !#strings.isEmpty(review.feedback)}"
                                              class="review-feedback mb-2">

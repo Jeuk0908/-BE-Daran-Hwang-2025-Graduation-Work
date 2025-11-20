@@ -183,9 +183,10 @@
         </div>
 
         <!-- 사용자 후기 (별도 섹션으로 분리) -->
-        <div class="row mt-4" th:if="${attempt.rating != null}">
+        <div class="row mt-4" th:if="${attempt.rating != null || (attempt.ratingText != null && attempt.ratingText == '포기')}">
             <div class="col-md-12">
-                <div class="card" style="border-left: 4px solid #ffc107;">
+                <!-- 완료한 미션 (평점 있음) -->
+                <div class="card" style="border-left: 4px solid #ffc107;" th:if="${attempt.rating != null}">
                     <div class="card-body">
                         <h5 class="card-title">💬 사용자 후기</h5>
 
@@ -213,10 +214,33 @@
                         <div th:if="${attempt.feedback == null || #strings.isEmpty(attempt.feedback)}">
                             <p class="text-muted fst-italic">사용자가 텍스트 피드백을 남기지 않았습니다.</p>
                         </div>
+                    </div>
+                </div>
 
-                        <table class="table table-borderless mt-3" style="display: none;">
-                            <!-- 기존 테이블 숨김 처리 -->
-                        </table>
+                <!-- 포기한 미션 (포기 사유) -->
+                <div class="card" style="border-left: 4px solid #dc3545;" th:if="${attempt.rating == null && attempt.ratingText == '포기'}">
+                    <div class="card-body">
+                        <h5 class="card-title">🚪 포기 사유</h5>
+
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <span style="font-size: 2rem;">😞</span>
+                                <span class="ms-3">
+                                    <span class="badge bg-danger" style="font-size: 1.2rem; padding: 0.5em 1em;">미션 포기</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div th:if="${attempt.feedback != null && !#strings.isEmpty(attempt.feedback)}">
+                            <h6 class="text-muted mb-2">📝 포기 사유:</h6>
+                            <div class="alert alert-light" style="background: #fff5f5; border-left: 3px solid #dc3545; font-size: 1.1rem;">
+                                <em th:text="${attempt.feedback}">너무 어려워서 포기했습니다</em>
+                            </div>
+                        </div>
+
+                        <div th:if="${attempt.feedback == null || #strings.isEmpty(attempt.feedback)}">
+                            <p class="text-muted fst-italic">포기 사유를 남기지 않았습니다.</p>
+                        </div>
                     </div>
                 </div>
             </div>

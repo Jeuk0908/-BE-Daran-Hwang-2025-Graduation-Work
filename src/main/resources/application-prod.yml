@@ -33,3 +33,14 @@ logging:
     org.springframework: WARN
     org.hibernate.SQL: WARN
     org.example.greduatebe: ${LOGGING_LEVEL_APP:INFO}
+
+# Actuator 설정 (헬스체크용)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
